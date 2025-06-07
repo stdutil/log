@@ -1,6 +1,6 @@
 // Package log is a lightweight direct logging library
 //
-// A Log is a derivative of LiveNote (github.com/narsilworks/livenote) to be used
+// log is a derivative of LiveNote (github.com/narsilworks/livenote) to be used
 // independently for stdutil
 //
 //	Author: Elizalde G. Baguinon
@@ -16,7 +16,7 @@ import (
 // LogType
 type LogType string
 
-// NoteType constants
+// LogType constants
 const (
 	Info    LogType = "INF"
 	Warn    LogType = "WRN"
@@ -49,7 +49,7 @@ func NewLog(prefix string) *Log {
 }
 
 // Fmt accepts format and argument to return a string
-func Fmt(format string, args ...interface{}) string {
+func Fmt(format string, args ...any) string {
 	return fmt.Sprintf(format, args...)
 }
 
