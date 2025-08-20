@@ -84,7 +84,17 @@ func (r *Log) AddSuccess(msg ...string) {
 // AddAppMsg adds an application message
 func (r *Log) AddAppMsg(msg ...string) {
 	for _, m := range msg {
-		addMessage(&r.ln, r.Prefix, m, App)
+		lpos := strings.Index(m, "[")
+		rpos := strings.Index(m, "]")
+		//pfx := ""
+		errT := ""
+		ms := m
+		if (lpos > -1 && rpos > -1) && lpos < rpos {
+			//pfx = m[lpos:rpos]
+			ms = m[rpos+1:]
+			errT = m[0:lpos]
+		}
+		addMessage(&r.ln, r.Prefix, ms, LogType(errT))
 	}
 }
 
