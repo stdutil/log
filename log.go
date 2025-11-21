@@ -81,6 +81,13 @@ func (r *Log) AddSuccess(msg ...string) {
 	}
 }
 
+// AddFatal adds a fatal message
+func (r *Log) AddFatal(msg ...string) {
+	for _, m := range msg {
+		addMessage(&r.ln, r.Prefix, m, Fatal)
+	}
+}
+
 // AddAppMsg adds an application message
 func (r *Log) AddAppMsg(msg ...string) {
 	for _, m := range msg {
@@ -148,6 +155,16 @@ func (r Log) HasSucceses() bool {
 	return false
 }
 
+// HasFatals checks if the message array has fatal errors
+func (r Log) HasFatals() bool {
+	for _, ln := range r.ln {
+		if ln.Type == Fatal {
+			return true
+		}
+	}
+	return false
+}
+
 // Prevailing checks for a dominant message
 func (r *Log) Prevailing() LogType {
 	return getDominantNoteType(&r.ln)
@@ -198,7 +215,7 @@ func addMessage(nt *[]LogInfo, prefix, msg string, typ LogType) {
 // get dominant message
 func getDominantNoteType(msgs *[]LogInfo) LogType {
 	var (
-		nfo, wrn, err, suc int
+		nfo, wrn, err, suc, ftl int
 	)
 
 	for _, msg := range *msgs {
@@ -211,19 +228,24 @@ func getDominantNoteType(msgs *[]LogInfo) LogType {
 			err++
 		case Success:
 			suc++
+		case Fatal:
+			ftl++
 		}
 	}
-	if nfo > wrn && nfo > err && nfo > suc {
+	if nfo > wrn && nfo > err && nfo > suc && nfo > ftl {
 		return Info
 	}
-	if wrn > nfo && wrn > err && wrn > suc {
+	if wrn > nfo && wrn > err && wrn > suc && wrn > ftl {
 		return Warn
 	}
-	if err > nfo && err > wrn && err > suc {
+	if err > nfo && err > wrn && err > suc && err > ftl {
 		return Error
 	}
-	if suc > nfo && suc > wrn && suc > err {
+	if suc > nfo && suc > wrn && suc > err && suc > ftl {
 		return Success
+	}
+	if ftl > nfo && ftl > wrn && ftl > err && ftl > suc {
+		return Fatal
 	}
 	return App
 }
