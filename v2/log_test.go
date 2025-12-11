@@ -15,3 +15,14 @@ func TestString(t *testing.T) {
 	l.AddAppMsg("Anything goes!", Format(FormatBold|FormatItalic|FormatUnderline))
 	t.Log(l.String())
 }
+
+func TestAddAppMsg(t *testing.T) {
+	// Add without prefix
+	l := Log{}
+	l.AddAppMsg("ERR: This is an error message!")
+
+	// Add with prefix
+	l.Prefix = "MESSAGE"
+	l.AddAppMsg("ERR: This is an error message that has prefix!")
+	t.Logf("HasError: %t, Message: %s", l.HasErrors(), l.String())
+}

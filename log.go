@@ -91,17 +91,31 @@ func (r *Log) AddFatal(msg ...string) {
 // AddAppMsg adds an application message
 func (r *Log) AddAppMsg(msg ...string) {
 	for _, m := range msg {
-		lpos := strings.Index(m, "[")
-		rpos := strings.Index(m, "]")
-		//pfx := ""
 		errT := ""
 		ms := m
+
+		// Check for prefix, if there is a prefix,
+		// strip the prefix and check for the error type
+		lpos := strings.Index(m, "[")
+		rpos := strings.Index(m, "]")
 		if (lpos > -1 && rpos > -1) && lpos < rpos {
-			//pfx = m[lpos:rpos]
-			ms = m[rpos+1:]
-			errT = m[0:lpos]
+			errT = strings.TrimSpace(m[0:lpos])
+			ms = strings.TrimSpace(m[rpos+1:])
+			addMessage(&r.ln, r.Prefix, ms, LogType(errT))
+			return
 		}
-		addMessage(&r.ln, r.Prefix, ms, LogType(errT))
+
+		// If there is no prefix, check for a colon
+		rpos = strings.Index(m, ":")
+		if rpos > -1 {
+			errT = strings.TrimSpace(m[0:rpos])
+			ms = strings.TrimSpace(m[rpos+1:])
+			addMessage(&r.ln, r.Prefix, ms, LogType(errT))
+			return
+		}
+
+		// If there is no colon nor prefix, add without parsing
+		addMessage(&r.ln, r.Prefix, ms, LogType(App))
 	}
 }
 

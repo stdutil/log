@@ -90,15 +90,32 @@ func (r *Log) AddAppMsg(msg string, opts ...LogInfoOption) {
 	for _, o := range opts {
 		o(&li)
 	}
-	lpos := strings.Index(msg, "[")
-	rpos := strings.Index(msg, "]")
+
 	errT := ""
 	ms := msg
+
+	// Check for prefix, if there is a prefix,
+	// strip the prefix and check for the error type
+	lpos := strings.Index(msg, "[")
+	rpos := strings.Index(msg, "]")
 	if (lpos > -1 && rpos > -1) && lpos < rpos {
-		ms = msg[rpos+1:]
-		errT = msg[0:lpos]
+		errT = strings.TrimSpace(msg[0:lpos])
+		ms = strings.TrimSpace(msg[rpos+1:])
+		addMessage(&r.ln, r.Prefix, ms, LogType(errT), li.Format)
+		return
 	}
-	addMessage(&r.ln, r.Prefix, ms, LogType(errT), li.Format)
+
+	// If there is no prefix, check for a colon
+	rpos = strings.Index(msg, ":")
+	if rpos > -1 {
+		errT = strings.TrimSpace(msg[0:rpos])
+		ms = strings.TrimSpace(msg[rpos+1:])
+		addMessage(&r.ln, r.Prefix, ms, LogType(errT), li.Format)
+		return
+	}
+
+	// If there is no colon nor prefix, add without parsing
+	addMessage(&r.ln, r.Prefix, ms, LogType(App), li.Format)
 }
 
 // Append adds a note object or more to the current list
