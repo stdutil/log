@@ -35,7 +35,7 @@ func (r *Log) AddInfo(msg string, opts ...LogInfoOption) {
 	for _, o := range opts {
 		o(&li)
 	}
-	addMessage(&r.ln, r.Prefix, msg, Info, li.Format)
+	addMessage(&r.ln, r.Prefix, msg, Info, li.Format, li.Media)
 }
 
 // AddWarning adds a warning message
@@ -46,7 +46,7 @@ func (r *Log) AddWarning(msg string, opts ...LogInfoOption) {
 	for _, o := range opts {
 		o(&li)
 	}
-	addMessage(&r.ln, r.Prefix, msg, Warn, li.Format)
+	addMessage(&r.ln, r.Prefix, msg, Warn, li.Format, li.Media)
 }
 
 // AddError adds an error message
@@ -57,7 +57,7 @@ func (r *Log) AddError(msg string, opts ...LogInfoOption) {
 	for _, o := range opts {
 		o(&li)
 	}
-	addMessage(&r.ln, r.Prefix, msg, Error, li.Format)
+	addMessage(&r.ln, r.Prefix, msg, Error, li.Format, li.Media)
 }
 
 // AddFatal adds a fatal error message
@@ -68,7 +68,7 @@ func (r *Log) AddFatal(msg string, opts ...LogInfoOption) {
 	for _, o := range opts {
 		o(&li)
 	}
-	addMessage(&r.ln, r.Prefix, msg, Fatal, li.Format)
+	addMessage(&r.ln, r.Prefix, msg, Fatal, li.Format, li.Media)
 }
 
 // AddSuccess adds a success message
@@ -79,7 +79,7 @@ func (r *Log) AddSuccess(msg string, opts ...LogInfoOption) {
 	for _, o := range opts {
 		o(&li)
 	}
-	addMessage(&r.ln, r.Prefix, msg, Success, li.Format)
+	addMessage(&r.ln, r.Prefix, msg, Success, li.Format, li.Media)
 }
 
 // AddAppMsg adds an application message
@@ -101,7 +101,7 @@ func (r *Log) AddAppMsg(msg string, opts ...LogInfoOption) {
 	if (lpos > -1 && rpos > -1) && lpos < rpos {
 		errT = strings.TrimSpace(msg[0:lpos])
 		ms = strings.TrimSpace(msg[rpos+1:])
-		addMessage(&r.ln, r.Prefix, ms, LogType(errT), li.Format)
+		addMessage(&r.ln, r.Prefix, ms, LogType(errT), li.Format, li.Media)
 		return
 	}
 
@@ -110,12 +110,12 @@ func (r *Log) AddAppMsg(msg string, opts ...LogInfoOption) {
 	if rpos > -1 {
 		errT = strings.TrimSpace(msg[0:rpos])
 		ms = strings.TrimSpace(msg[rpos+1:])
-		addMessage(&r.ln, r.Prefix, ms, LogType(errT), li.Format)
+		addMessage(&r.ln, r.Prefix, ms, LogType(errT), li.Format, li.Media)
 		return
 	}
 
 	// If there is no colon nor prefix, add without parsing
-	addMessage(&r.ln, r.Prefix, ms, LogType(App), li.Format)
+	addMessage(&r.ln, r.Prefix, ms, LogType(App), li.Format, li.Media)
 }
 
 // Append adds a note object or more to the current list
@@ -202,7 +202,7 @@ func (r *Log) String() string {
 }
 
 // add new message to the message array
-func addMessage(nt *[]LogInfo, prefix, msg string, typ LogType, styleFmt FontFormat) {
+func addMessage(nt *[]LogInfo, prefix, msg string, typ LogType, styleFmt FontFormat, media LogMedia) {
 	msg = strings.TrimSpace(msg)
 	*nt = append(*nt,
 		LogInfo{
@@ -210,6 +210,7 @@ func addMessage(nt *[]LogInfo, prefix, msg string, typ LogType, styleFmt FontFor
 			Message: msg,
 			Type:    typ,
 			Format:  styleFmt,
+			Media:   media,
 		})
 }
 

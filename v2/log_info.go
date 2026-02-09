@@ -4,6 +4,7 @@ import "strings"
 
 // LogType
 type LogType string
+type LogMedia int8
 type FontFormat uint16
 
 type LogInfo struct {
@@ -11,6 +12,7 @@ type LogInfo struct {
 	Format  FontFormat
 	Prefix  string
 	Message string
+	Media   LogMedia
 }
 
 // Formats
@@ -45,28 +47,49 @@ const (
 	sucClr   string = "32"
 )
 
+const (
+	MediaConsole LogMedia = iota
+	MediaWeb
+)
+
 // String returns the message as string
 func (lni LogInfo) String() string {
 	sb := strings.Builder{}
+
+	shouldHaveStyle := false
+	switch lni.Type {
+	case Error:
+		shouldHaveStyle = true
+	case Fatal:
+		shouldHaveStyle = true
+	case Warn:
+		shouldHaveStyle = true
+	case Info:
+		shouldHaveStyle = true
+	case Success:
+		shouldHaveStyle = true
+	}
+
 	if lni.Type != App {
-		withStyle := true
-		switch lni.Type {
-		case Error:
-			sb.WriteString(sgr(errClr))
-		case Fatal:
-			sb.WriteString(sgr(ftlClr))
-		case Warn:
-			sb.WriteString(sgr(wrnClr))
-		case Info:
-			sb.WriteString(sgr(infClr))
-		case Success:
-			sb.WriteString(sgr(sucClr))
-		default:
-			withStyle = false
+		if shouldHaveStyle && lni.Media == MediaConsole {
+			switch lni.Type {
+			case Error:
+				sb.WriteString(sgr(errClr))
+			case Fatal:
+				sb.WriteString(sgr(ftlClr))
+			case Warn:
+				sb.WriteString(sgr(wrnClr))
+			case Info:
+				sb.WriteString(sgr(infClr))
+			case Success:
+				sb.WriteString(sgr(sucClr))
+			}
 		}
+
 		sb.WriteString(string(lni.Type))
+
 		// Reset
-		if withStyle {
+		if shouldHaveStyle && lni.Media == MediaConsole {
 			sb.WriteString(sgr(rst))
 		}
 
@@ -78,22 +101,25 @@ func (lni LogInfo) String() string {
 		sb.WriteString(`: `)
 	}
 
-	var codes []string
-	if lni.Format.Has(FormatBold) {
-		codes = append(codes, fmtBold)
-	}
-	if lni.Format.Has(FormatItalic) {
-		codes = append(codes, fmtItal)
-	}
-	if lni.Format.Has(FormatUnderline) {
-		codes = append(codes, fmtUndr)
-	}
-	if len(codes) > 0 {
-		sb.WriteString(sgr(codes...))
+	if lni.Format != FormatNone && lni.Media == MediaConsole {
+		var codes []string
+		if lni.Format.Has(FormatBold) {
+			codes = append(codes, fmtBold)
+		}
+		if lni.Format.Has(FormatItalic) {
+			codes = append(codes, fmtItal)
+		}
+		if lni.Format.Has(FormatUnderline) {
+			codes = append(codes, fmtUndr)
+		}
+		if len(codes) > 0 {
+			sb.WriteString(sgr(codes...))
+		}
 	}
 
 	sb.WriteString(lni.Message)
-	if lni.Format != FormatNone {
+
+	if lni.Format != FormatNone && lni.Media == MediaConsole {
 		sb.WriteString(sgr(rst))
 	}
 

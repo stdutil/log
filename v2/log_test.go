@@ -9,7 +9,7 @@ func TestString(t *testing.T) {
 	l.AddError("Error writing message (bold)", Format(FormatBold))
 	l.AddError("Error writing message (italic)", Format(FormatItalic))
 	l.AddError("Error writing message (underline)", Format(FormatUnderline))
-	l.AddFatal("Fatal error")
+	l.AddFatal("Fatal error", Media(MediaWeb))
 	l.AddInfo("More information")
 	l.AddSuccess("Successful!")
 	l.AddAppMsg("Anything goes!", Format(FormatBold|FormatItalic|FormatUnderline))
