@@ -196,7 +196,7 @@ func (r *Log) String() string {
 	}
 	sb := strings.Builder{}
 	for _, v := range r.ln {
-		sb.WriteString(v.String() + lf)
+		sb.WriteString(v.String());sb.WriteString(lf)
 	}
 	return sb.String()
 }
