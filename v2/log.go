@@ -40,6 +40,8 @@ func NewLog(opts ...LogOption) *Log {
 func (r *Log) AddInfo(msg string, opts ...LogInfoOption) {
 	li := LogInfo{
 		Format: FormatNone,
+		Media:  r.media,
+		Prefix: r.prefix,
 	}
 	for _, o := range opts {
 		if o == nil {
@@ -54,6 +56,8 @@ func (r *Log) AddInfo(msg string, opts ...LogInfoOption) {
 func (r *Log) AddWarning(msg string, opts ...LogInfoOption) {
 	li := LogInfo{
 		Format: FormatNone,
+		Media:  r.media,
+		Prefix: r.prefix,
 	}
 	for _, o := range opts {
 		if o == nil {
@@ -68,6 +72,8 @@ func (r *Log) AddWarning(msg string, opts ...LogInfoOption) {
 func (r *Log) AddError(msg string, opts ...LogInfoOption) {
 	li := LogInfo{
 		Format: FormatNone,
+		Media:  r.media,
+		Prefix: r.prefix,
 	}
 	for _, o := range opts {
 		if o == nil {
@@ -82,6 +88,8 @@ func (r *Log) AddError(msg string, opts ...LogInfoOption) {
 func (r *Log) AddFatal(msg string, opts ...LogInfoOption) {
 	li := LogInfo{
 		Format: FormatNone,
+		Media:  r.media,
+		Prefix: r.prefix,
 	}
 	for _, o := range opts {
 		if o == nil {
@@ -96,6 +104,8 @@ func (r *Log) AddFatal(msg string, opts ...LogInfoOption) {
 func (r *Log) AddSuccess(msg string, opts ...LogInfoOption) {
 	li := LogInfo{
 		Format: FormatNone,
+		Media:  r.media,
+		Prefix: r.prefix,
 	}
 	for _, o := range opts {
 		if o == nil {
@@ -110,6 +120,8 @@ func (r *Log) AddSuccess(msg string, opts ...LogInfoOption) {
 func (r *Log) AddAppMsg(msg string, opts ...LogInfoOption) {
 	li := LogInfo{
 		Format: FormatNone,
+		Media:  r.media,
+		Prefix: r.prefix,
 	}
 	for _, o := range opts {
 		if o == nil {
