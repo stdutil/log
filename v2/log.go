@@ -14,17 +14,26 @@ import (
 )
 
 type Log struct {
-	Prefix  string
+	prefix  string
 	ln      []LogInfo
 	osIsWin bool
+	media   LogMedia
 }
 
-func NewLog(prefix string) *Log {
-	return &Log{
-		Prefix:  prefix,
+func NewLog(opts ...LogOption) *Log {
+	l := Log{
+		prefix:  "",
+		media:   MediaConsole,
 		ln:      make([]LogInfo, 0),
 		osIsWin: runtime.GOOS == "windows",
 	}
+	for _, o := range opts {
+		if o == nil {
+			continue
+		}
+		o(&l)
+	}
+	return &l
 }
 
 // AddInfo adds an information message
@@ -33,9 +42,12 @@ func (r *Log) AddInfo(msg string, opts ...LogInfoOption) {
 		Format: FormatNone,
 	}
 	for _, o := range opts {
+		if o == nil {
+			continue
+		}
 		o(&li)
 	}
-	addMessage(&r.ln, r.Prefix, msg, Info, li.Format, li.Media)
+	addMessage(&r.ln, r.prefix, msg, Info, li.Format, li.Media)
 }
 
 // AddWarning adds a warning message
@@ -44,9 +56,12 @@ func (r *Log) AddWarning(msg string, opts ...LogInfoOption) {
 		Format: FormatNone,
 	}
 	for _, o := range opts {
+		if o == nil {
+			continue
+		}
 		o(&li)
 	}
-	addMessage(&r.ln, r.Prefix, msg, Warn, li.Format, li.Media)
+	addMessage(&r.ln, r.prefix, msg, Warn, li.Format, li.Media)
 }
 
 // AddError adds an error message
@@ -55,9 +70,12 @@ func (r *Log) AddError(msg string, opts ...LogInfoOption) {
 		Format: FormatNone,
 	}
 	for _, o := range opts {
+		if o == nil {
+			continue
+		}
 		o(&li)
 	}
-	addMessage(&r.ln, r.Prefix, msg, Error, li.Format, li.Media)
+	addMessage(&r.ln, r.prefix, msg, Error, li.Format, li.Media)
 }
 
 // AddFatal adds a fatal error message
@@ -66,9 +84,12 @@ func (r *Log) AddFatal(msg string, opts ...LogInfoOption) {
 		Format: FormatNone,
 	}
 	for _, o := range opts {
+		if o == nil {
+			continue
+		}
 		o(&li)
 	}
-	addMessage(&r.ln, r.Prefix, msg, Fatal, li.Format, li.Media)
+	addMessage(&r.ln, r.prefix, msg, Fatal, li.Format, li.Media)
 }
 
 // AddSuccess adds a success message
@@ -77,9 +98,12 @@ func (r *Log) AddSuccess(msg string, opts ...LogInfoOption) {
 		Format: FormatNone,
 	}
 	for _, o := range opts {
+		if o == nil {
+			continue
+		}
 		o(&li)
 	}
-	addMessage(&r.ln, r.Prefix, msg, Success, li.Format, li.Media)
+	addMessage(&r.ln, r.prefix, msg, Success, li.Format, li.Media)
 }
 
 // AddAppMsg adds an application message
@@ -88,6 +112,9 @@ func (r *Log) AddAppMsg(msg string, opts ...LogInfoOption) {
 		Format: FormatNone,
 	}
 	for _, o := range opts {
+		if o == nil {
+			continue
+		}
 		o(&li)
 	}
 
@@ -101,7 +128,7 @@ func (r *Log) AddAppMsg(msg string, opts ...LogInfoOption) {
 	if (lpos > -1 && rpos > -1) && lpos < rpos {
 		errT = strings.TrimSpace(msg[0:lpos])
 		ms = strings.TrimSpace(msg[rpos+1:])
-		addMessage(&r.ln, r.Prefix, ms, LogType(errT), li.Format, li.Media)
+		addMessage(&r.ln, r.prefix, ms, LogType(errT), li.Format, li.Media)
 		return
 	}
 
@@ -110,12 +137,12 @@ func (r *Log) AddAppMsg(msg string, opts ...LogInfoOption) {
 	if rpos > -1 {
 		errT = strings.TrimSpace(msg[0:rpos])
 		ms = strings.TrimSpace(msg[rpos+1:])
-		addMessage(&r.ln, r.Prefix, ms, LogType(errT), li.Format, li.Media)
+		addMessage(&r.ln, r.prefix, ms, LogType(errT), li.Format, li.Media)
 		return
 	}
 
 	// If there is no colon nor prefix, add without parsing
-	addMessage(&r.ln, r.Prefix, ms, LogType(App), li.Format, li.Media)
+	addMessage(&r.ln, r.prefix, ms, LogType(App), li.Format, li.Media)
 }
 
 // Append adds a note object or more to the current list
@@ -196,7 +223,22 @@ func (r *Log) String() string {
 	}
 	sb := strings.Builder{}
 	for _, v := range r.ln {
-		sb.WriteString(v.String());sb.WriteString(lf)
+		sb.WriteString(v.String())
+		sb.WriteString(lf)
+	}
+	return sb.String()
+}
+
+// StringRaw return the messages as a carriage/return delimited string without prefix or formatting
+func (r *Log) StringRaw() string {
+	lf := "\n"
+	if r.osIsWin {
+		lf = "\r\n"
+	}
+	sb := strings.Builder{}
+	for _, v := range r.ln {
+		sb.WriteString(v.StringRaw())
+		sb.WriteString(lf)
 	}
 	return sb.String()
 }

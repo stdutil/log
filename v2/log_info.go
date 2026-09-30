@@ -52,7 +52,7 @@ const (
 	MediaWeb
 )
 
-// String returns the message as string
+// String returns the log info details as string
 func (lni LogInfo) String() string {
 	sb := strings.Builder{}
 
@@ -123,6 +123,13 @@ func (lni LogInfo) String() string {
 		sb.WriteString(sgr(rst))
 	}
 
+	return sb.String()
+}
+
+// StringRaw returns the messages without any prefix or formatting
+func (lni LogInfo) StringRaw() string {
+	sb := strings.Builder{}
+	sb.WriteString(lni.Message)
 	return sb.String()
 }
 

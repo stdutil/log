@@ -202,6 +202,19 @@ func (r *Log) ToString() string {
 	return sb.String()
 }
 
+// ToStringRaw returns the messages as a carriage/return delimited string without any prefix
+func (r *Log) ToStringRaw() string {
+	lf := "\n"
+	if r.osIsWin {
+		lf = "\r\n"
+	}
+	sb := strings.Builder{}
+	for _, v := range r.ln {
+		sb.Write([]byte(v.ToStringRaw() + lf))
+	}
+	return sb.String()
+}
+
 // ToString return the messages as a carriage/return delimited string
 func (lni *LogInfo) ToString() string {
 	td := ""
@@ -214,6 +227,11 @@ func (lni *LogInfo) ToString() string {
 	}
 	td += lni.Message
 	return td
+}
+
+// ToStringRaw returns the current log info message without any prefix
+func (lni *LogInfo) ToStringRaw() string {
+	return lni.Message
 }
 
 // add new message to the message array
